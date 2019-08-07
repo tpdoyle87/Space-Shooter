@@ -10,12 +10,24 @@ public class Player : MonoBehaviour
     [SerializeField]
     private GameObject _laserPrefab;
     [SerializeField]
-    private float _fireRate = 0.5f;
+    private float _fireRate = 2f;
+    [SerializeField]
     private float _canFire = -1f;
-
-    void Start()
+    [SerializeField]
+    private float _hitCount = 3f;
+    private SpawnManager _spawnManager;
+    [SerializeField]
+    private GameObject _tripleshotPrefab;
+    [SerializeField]
+    private bool _tripleshotActive = false;
+void Start()
     {
         transform.position = new Vector3(0, 0, 0);
+        _spawnManager = GameObject.Find("Spawn_Manager").GetComponent<SpawnManager>();
+        if (_spawnManager == null)
+        {
+            Debug.Log("Spawn Manager is NULL!");
+        }
     }
 
     void Update()
@@ -31,7 +43,30 @@ public class Player : MonoBehaviour
     void FireLaser()
     {
         _canFire = Time.time + _fireRate;
-        Instantiate(_laserPrefab, transform.position + new Vector3(0, 0.8f, 0), Quaternion.identity);
+            if (_tripleshotActive)
+            {
+                Instantiate(_tripleshotPrefab, transform.position, Quaternion.identity);
+            }
+            else
+            {
+                Instantiate(_laserPrefab, transform.position + new Vector3(0, 0.73f, 0), Quaternion.identity);
+
+            }
+
+    }
+
+    public void Damage()
+    {
+
+        _hitCount--;
+        if (_hitCount < 1)
+        {
+            if (_spawnManager != null)
+            {
+                _spawnManager.onPlayerDeath();
+            }
+            Destroy(this.gameObject);
+        }
     }
 
     void CalculateMovement()
@@ -42,15 +77,15 @@ public class Player : MonoBehaviour
 
         transform.Translate(direction * _speed * Time.deltaTime);
 
-        transform.position = new Vector3(transform.position.x, Mathf.Clamp(transform.position.y, -3, 0), 0);
+        transform.position = new Vector3(transform.position.x, Mathf.Clamp(transform.position.y, -10.6f, 0), 0);
 
-        if (transform.position.x >= 9.5)
+        if (transform.position.x >= 19.75f)
         {
-            transform.position = new Vector3(-12.9f, transform.position.y, 0);
+            transform.position = new Vector3(-20.50f, transform.position.y, 0);
         }
-        else if (transform.position.x <= -13)
+        else if (transform.position.x <= -20.75f)
         {
-            transform.position = new Vector3(9.4f, transform.position.y, 0);
+            transform.position = new Vector3(19.74f, transform.position.y, 0);
         }
     }
 }
